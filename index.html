@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>天空の館 密室殺人事件</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Shippori+Mincho:wght@500;700&family=Yuji+Syuku&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --panel-bg: rgba(23, 26, 33, 0.95);
+            --border-gold: #c5a059;
+            --border-gold-glow: rgba(197, 160, 89, 0.4);
+            --text-gold: #e5c158;
+            --text-light: #dcdde1;
+            --hinana-color: #ff7675;
+            --kaikun-color: #74b9ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            font-family: 'Shippori Mincho', serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(30, 20, 50, 0.6) 0%, transparent 70%),
+                radial-gradient(circle at 80% 80%, rgba(20, 40, 60, 0.4) 0%, transparent 60%);
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-gold);
+            box-shadow: 0 0 20px var(--border-gold-glow);
+            border-radius: 12px;
+            position: relative;
+            padding: 16px;
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #title-screen {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, #1a1c23 0%, #08090c 100%);
+            z-index: 100;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .title-sub {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 3px;
+            color: var(--border-gold);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .title-main {
+            font-family: 'Yuji Syuku', serif;
+            font-size: 2.3rem;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(229, 193, 88, 0.6), 3px 3px 5px #000;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .title-desc {
+            font-size: 0.88rem;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .title-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 260px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #c5a059 0%, #8a6d3b 100%);
+            color: #000;
+            font-weight: bold;
+            font-size: 1.05rem;
+            padding: 14px 20px;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            font-family: 'Shippori Mincho', serif;
+            width: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--border-gold);
+            border: 1px solid var(--border-gold);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-gold);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .chapter-title {
+            color: var(--text-gold);
+            font-size: 1.05rem;
+            font-weight: bold;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-gold);
+            color: var(--text-gold);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .tab-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            padding: 10px 4px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .tab-btn.hinana {
+            border-color: var(--hinana-color);
+            color: var(--hinana-color);
+        }
+
+        .tab-btn.kaikun {
+            border-color: var(--kaikun-color);
+            color: var(--kaikun-color);
+        }
+
+        .tab-btn.active.hinana {
+            background: var(--hinana-color);
+            color: #000;
+        }
+
+        .tab-btn.active.kaikun {
+            background: var(--kaikun-color);
+            color: #000;
+        }
+
+        .info-card {
+            background: rgba(10, 12, 16, 0.85);
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            border-radius: 8px;
+            padding: 14px;
+            min-height: 180px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .role-badge.hinana {
+            background: var(--hinana-color);
+            color: #000;
+        }
+
+        .role-badge.kaikun {
+            background: var(--kaikun-color);
+            color: #000;
+        }
+
+        .story-text {
+            color: #e0e0e0;
+            font-size: 0.92rem;
+            white-space: pre-wrap;
+        }
+
+        .question-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--border-gold);
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .question-title {
+            color: var(--text-gold);
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .answer-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-gold);
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .hint-section {
+            margin-top: 10px;
+            font-size: 0.82rem;
+        }
+
+        .hint-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .hint-content {
+            background: rgba(229, 193, 88, 0.1);
+            border: 1px dashed var(--border-gold);
+            padding: 8px;
+            border-radius: 4px;
+            color: #ffd700;
+            line-height: 1.4;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: #15181e;
+            border: 2px solid var(--border-gold);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 16px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            color: #aaa;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .suspect-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .suspect-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+        }
+
+        .suspect-name {
+            color: var(--text-gold);
+            font-weight: bold;
+            font-size: 0.92rem;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="title-screen">
+        <div class="title-sub">2-PLAYER COOPERATIVE MYSTERY</div>
+        <div class="title-main">天空の館<br>密室殺人事件</div>
+        <div class="title-desc">
+            外界から閉ざされた洋館で起きた密室殺人。<br>
+            「ひなな」と「かいくん」、2人に与えられた異なる情報を会話で繋ぎ合わせ、館に秘められた18の謎と真実を解き明かせ！
+        </div>
+        <div class="title-btn-group">
+            <button class="btn-gold" id="btn-start-game">ゲームをはじめる</button>
+            <button class="btn-outline" id="btn-resume-game" style="display: none;">つづきから（第<span id="resume-stage">1</span>問）</button>
+        </div>
+    </div>
+
+    <div class="game-header">
+        <div class="chapter-title" id="stage-title">第1問：封印された招待状</div>
+        <div class="header-controls">
+            <button class="icon-btn" id="btn-sound-toggle">🔊 BGM</button>
+            <button class="icon-btn" id="btn-open-dossier">📁 資料庫</button>
+        </div>
+    </div>
+
+    <div class="tab-container">
+        <div class="tab-btn hinana active" id="tab-hinana" onclick="switchRole('hinana')">
+            👩 ひななの情報
+        </div>
+        <div class="tab-btn kaikun" id="tab-kaikun" onclick="switchRole('kaikun')">
+            👨 かいくんの情報
+        </div>
+    </div>
+
+    <div class="info-card">
+        <div class="role-badge hinana" id="role-badge">ひなな専用の手がかり</div>
+        <div class="story-text" id="story-display">読み込み中...</div>
+    </div>
+
+    <div class="question-box">
+        <div class="question-title" id="question-text">謎を解いて暗号を入力せよ</div>
+        <div class="input-group">
+            <input type="text" id="answer-input" class="answer-input" placeholder="答えを入力してください" autocomplete="off">
+            <button class="btn-gold" id="btn-submit" onclick="checkAnswer()">回答する</button>
+        </div>
+        
+        <div class="hint-section">
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+                <button class="icon-btn" style="flex:1; padding:8px 4px;" onclick="revealHint(1)">💡 ヒント1</button>
+                <button class="icon-btn" style="flex:1; padding:8px 4px;" onclick="revealHint(2)">💡 ヒント2</button>
+                <button class="icon-btn" style="flex:1; padding:8px 4px;" onclick="revealHint(3)">💡 ヒント3</button>
+            </div>
+            <div id="hint-container" class="hint-container"></div>
+        </div>
+    </div>
+</div>
+
+<div id="dossier-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeDossier()">&times;</span>
+        <h2 style="color: var(--text-gold); border-bottom: 1px solid var(--border-gold); padding-bottom: 6px; font-size: 1.1rem;">📁 捜査資料・容疑者一覧</h2>
+        
+        <h3 style="margin-top: 12px; color: #fff; font-size: 0.95rem;">【被害者】</h3>
+        <p style="font-size: 0.85rem; color: #ccc;">神楽坂 剛造 (60) - 豪商。書斎にて胸部刺創により死亡。</p>
+
+        <h3 style="margin-top: 12px; color: #fff; font-size: 0.95rem;">【容疑者 6名】</h3>
+        <div class="suspect-grid">
+            <div class="suspect-card">
+                <div class="suspect-name">1. 神楽坂 綾香 (28)</div>
+                <div>被害者の後妻。財産分与を巡り遺族と対立。</div>
+            </div>
+            <div class="suspect-card">
+                <div class="suspect-name">2. 神楽坂 蓮 (32)</div>
+                <div>長男。会社経営失敗の補填を断られていた。</div>
+            </div>
+            <div class="suspect-card">
+                <div class="suspect-name">3. 桐生 執事 (58)</div>
+                <div>長年仕える執事。主人の秘密を多く握る。</div>
+            </div>
+            <div class="suspect-card">
+                <div class="suspect-name">4. 翠川 医師 (45)</div>
+                <div>主治医。定期健康診断のため館に滞在中。</div>
+            </div>
+            <div class="suspect-card">
+                <div class="suspect-name">5. 結城 メイド (22)</div>
+                <div>新人メイド。事件当夜、書斎へお茶を運んだ。</div>
+            </div>
+            <div class="suspect-card">
+                <div class="suspect-name">6. 橘 探偵 (38)</div>
+                <div>脅迫状の調査で招かれた私立探偵。</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class SoundEngine {
+    constructor() {
+        this.ctx = null;
+        this.bgmGain = null;
+        this.isBgmPlaying = false;
+        this.soundEnabled = true;
+        this.bgmInterval = null;
+    }
+
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            this.bgmGain = this.ctx.createGain();
+            this.bgmGain.gain.value = 0.15;
+            this.bgmGain.connect(this.ctx.destination);
+        }
+    }
+
+    playClick() {
+        if (!this.soundEnabled) return;
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.05);
+    }
+
+    playCorrect() {
+        if (!this.soundEnabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.15, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.4);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.4);
+        });
+    }
+
+    playWrong() {
+        if (!this.soundEnabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.setValueAtTime(120, now + 0.15);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    }
+
+    startBGM() {
+        if (this.isBgmPlaying || !this.soundEnabled) return;
+        this.init();
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+        this.isBgmPlaying = true;
+        
+        let chordIndex = 0;
+        const chords = [
+            [130.81, 155.56, 196.00],
+            [123.47, 155.56, 185.00],
+            [116.54, 146.83, 174.61],
+            [110.00, 138.59, 164.81]
+        ];
+
+        this.bgmInterval = setInterval(() => {
+            if (!this.isBgmPlaying) return;
+            const now = this.ctx.currentTime;
+            const currentChord = chords[chordIndex % chords.length];
+            
+            currentChord.forEach((freq, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq * 2;
+                
+                gain.gain.setValueAtTime(0.001, now + idx * 0.4);
+                gain.gain.linearRampToValueAtTime(0.05, now + idx * 0.4 + 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.4 + 1.2);
+                
+                osc.connect(gain);
+                gain.connect(this.bgmGain);
+                osc.start(now + idx * 0.4);
+                osc.stop(now + idx * 0.4 + 1.2);
+            });
+            
+            chordIndex++;
+        }, 1600);
+    }
+
+    stopBGM() {
+        this.isBgmPlaying = false;
+        if (this.bgmInterval) clearInterval(this.bgmInterval);
+    }
+
+    toggleBGM() {
+        if (this.isBgmPlaying) {
+            this.stopBGM();
+            return false;
+        } else {
+            this.startBGM();
+            return true;
+        }
+    }
+}
+
+const audio = new SoundEngine();
+
+const STAGES = [
+    {
+        id: 1,
+        title: "第1問：封印された招待状",
+        hinana: "招待状の封筒には『赤い文字は飛ばし、偶数番目の文字だけを繋げ』と血のような赤インクで記されているわ。",
+        kaikun: "本文には『S A U K U R A A』と書かれた謎のアルファベットの配列がある。",
+        q: "招待状に隠された合言葉（英単語）は何？",
+        ans: ["AKURA", "akura"],
+        hints: [
+            "【ヒント1】赤い文字（奇数番目）を読み飛ばしてみましょう。",
+            "【ヒント2】2番目、4番目、6番目…の文字を取り出します。",
+            "【ヒント3】S(1) A(2) U(3) K(4) U(5) R(6) A(7) A(8) です。"
+        ]
+    },
+    {
+        id: 2,
+        title: "第2問：開かずの門扉",
+        hinana: "門のダイヤル錠には『昼と夜が交差する刻、太陽が沈む方角の数字』と刻まれているわ。",
+        kaikun: "館の案内板によると、西（West）の方角コードは『09』、日没時刻は『1800』と書かれている。",
+        q: "4桁の暗号数字を入力せよ",
+        ans: ["0918", "918"],
+        hints: [
+            "【ヒント1】西の方角コードと日没時刻を組み合わせます。",
+            "【ヒント2】西(09) ＋ 時間(18) です。",
+            "【ヒント3】『0918』を入力してください。"
+        ]
+    },
+    {
+        id: 3,
+        title: "第3問：エントランスのダイイングメッセージ",
+        hinana: "被害者が倒れていた床に『831』と血文字で書かれている。妻のアヤカさんは『野菜のことかしら？』と困惑しているわ。",
+        kaikun: "現場の鍵盤楽器（ピアノ）の楽譜に『ド=1, レ=2, ミ=3, ファ=4, ソ=5, ラ=6, シ=7』とメモがある。",
+        q: "血文字が示す音名3つを日本語（カタカナ3文字）で答えよ",
+        ans: ["ラミラ", "ラ・ミ・ラ"],
+        hints: [
+            "【ヒント1】数字を音符に変換します。8は7(シ)+1で『ラ』に戻ります。",
+            "【ヒント2】8=ラ, 3=ミ, 1=ド...？いや、8は1オクターブ上の『ラ』です。",
+            "【ヒント3】8=ラ, 3=ミ, 1=ラ です。"
+        ]
+    },
+    {
+        id: 4,
+        title: "第4問：書斎の密室トリック",
+        hinana: "書斎の閂（かんぬき）は内側から固く閉ざされていた。ドアの下にはわずか5ミリの隙間しかないわ。",
+        kaikun: "床には細い糸の繊維と、融けて水になった氷のあとが残されていた。",
+        q: "犯人が密室を作るために使った冷たい物体は何？（漢字2文字）",
+        ans: ["氷塊", "氷"],
+        hints: [
+            "【ヒント1】水になって消えてしまうものです。",
+            "【ヒント2】閂を固定し、時間が経つと溶けるもの。",
+            "【ヒント3】『氷』または『氷塊』です。"
+        ]
+    },
+    {
+        id: 5,
+        title: "第5問：凶器の行方",
+        hinana: "被害者の胸には鋭利な刃物で刺された痕があるが、部屋のどこにもナイフは見当たらない。",
+        kaikun: "暖炉の中で燃え残った『木製の細長い取っ手』と『溶けた金属の塊』が発見された。",
+        q: "消えた凶器の種類は何？（カタカナ3文字）",
+        ans: ["ナイフ", "ペーパーナイフ"],
+        hints: [
+            "【ヒント1】暖炉で燃やされた金属製の刃物です。",
+            "【ヒント2】書斎でよく使われる手紙開封用の道具。",
+            "【ヒント3】『ナイフ』です。"
+        ]
+    },
+    {
+        id: 6,
+        title: "第6問：長男・蓮のアリバイ",
+        hinana: "蓮「俺は20時に自分の部屋でラジオのクラシック番組を聴いていた！嘘じゃない！」",
+        kaikun: "ラジオ番組表データ：20時は野球中継の延長によりクラシック番組は放送中止となっていた。",
+        q: "蓮の主張の矛盾点（嘘をついていた理由のキーワード）を一言で（漢字2文字）",
+        ans: ["偽証", "嘘", "アリバイ", "放送"],
+        hints: [
+            "【ヒント1】蓮が聴いていたと言った番組は放送されていません。",
+            "【ヒント2】ラジオの『放送』内容が嘘です。",
+            "【ヒント3】『嘘』または『偽証』です。"
+        ]
+    },
+    {
+        id: 7,
+        title: "第7問：メイド・結城の証言",
+        hinana: "結城「20時15分にお茶をお持ちした時、旦那様は『後にしてくれ』と奥から声を出されました！」",
+        kaikun: "解剖医の所見によると、被害者の死亡推定時刻は『19時30分〜20時00分』の間である。",
+        q: "結城が聞いた『声』の正体は何を使った仕掛け？（カタカナ4文字）",
+        ans: ["テープ", "テープレコーダー", "レコーダー", "録音"],
+        hints: [
+            "【ヒント1】被害者はすでに死亡していたため、あらかじめ録音されたものです。",
+            "【ヒント2】音声を再生する機器。",
+            "【ヒント3】『テープ』または『レコーダー』です。"
+        ]
+    },
+    {
+        id: 8,
+        title: "第8問：絵画に隠された金庫",
+        hinana: "壁にかかった『ナポレオンの肖像画』の裏にダイヤル金庫を発見。肖像画の馬の足元に『馬の数×1111』とあるわ。",
+        kaikun: "館内には肖像画が4枚あり、描かれている馬の合計は3頭である。",
+        q: "金庫を解除する4桁の番号を入力せよ",
+        ans: ["3333"],
+        hints: [
+            "【ヒント1】馬の数は3頭です。",
+            "【ヒント2】3 × 1111 を計算します。",
+            "【ヒント3】『3333』です。"
+        ]
+    },
+    {
+        id: 9,
+        title: "第9問：金庫の中の遺言状",
+        hinana: "金庫から出てきた遺言状には『全財産を〇〇に譲る』とあるが、名前の部分が薬品で消されている！",
+        kaikun: "あぶり出し用の薬品とランプがある。文字の残り香は『柑橘類の香り』がする。",
+        q: "炙り出しに必要な果物の名前は何？（カタカナ2文字）",
+        ans: ["レモン", "れもん"],
+        hints: [
+            "【ヒント1】あぶり出しでよく使われる酸っぱい果物です。",
+            "【ヒント2】柑橘類の代表格。",
+            "【ヒント3】『レモン』です。"
+        ]
+    },
+    {
+        id: 10,
+        title: "第10問：主治医・翠川の診察記録",
+        hinana: "翠川医師「私は20時半まで自室で持病の薬を調合していました。」",
+        kaikun: "薬品棚の記録：翠川が使ったとされる安眠薬の瓶が1本丸ごと空になっている。",
+        q: "翠川が薬を使って誰かをどうしようとしていた？（漢字2文字）",
+        ans: ["昏睡", "睡眠", "毒殺", "殺害"],
+        hints: [
+            "【ヒント1】安眠薬を大量に飲ませるとどうなるか？",
+            "【ヒント2】意識を失わせること。",
+            "【ヒント3】『昏睡』または『睡眠』です。"
+        ]
+    },
+    {
+        id: 11,
+        title: "第11問：破られた写真の断片",
+        hinana: "ゴミ箱から破られた写真を見つけたわ！『被害者』と『若き日のある容疑者』が並んで写っている...",
+        kaikun: "写真の裏には『1998年 親子の誓い』と記されている。",
+        q: "被害者と隠し子関係にある容疑者の番号（1〜6）を答えよ",
+        ans: ["5", "5番", "結城"],
+        hints: [
+            "【ヒント1】年齢的に22歳のメイド・結城が当てはまります。",
+            "【ヒント2】1998年は28年前...ではなく結城の生まれ年？",
+            "【ヒント3】『5』(結城メイド) です。"
+        ]
+    },
+    {
+        id: 12,
+        title: "第12問：時計塔の鐘の謎",
+        hinana: "館の時計は毎正刻に鐘が鳴る仕組みになっているわ。でも犯行時刻の20時には鐘が鳴らなかったらしいの。",
+        kaikun: "時計塔のギア部分に『厚手のハンカチ』が挟まり、針が一時的に止められていた。",
+        q: "犯人が時間を誤誤認させるために使ったトリックは何の変更？（漢字2文字）",
+        ans: ["時刻", "時間"],
+        hints: [
+            "【ヒント1】鐘を止め、針を動かなくすることで何を狂わせたか？",
+            "【ヒント2】体感のアリバイ時間です。",
+            "【ヒント3】『時刻』または『時間』です。"
+        ]
+    },
+    {
+        id: 13,
+        title: "第13問：執事・桐生の密談",
+        hinana: "桐生執事が暗がりで誰かと電話していたわ。『例の件、旦那様にはバレていません』と...",
+        kaikun: "桐生の部屋から『横領の証拠書類』が大量に見つかった。",
+        q: "桐生の動機となった犯罪行為は何？（漢字2文字）",
+        ans: ["横領"],
+        hints: [
+            "【ヒント1】会社の金を不正に着服することです。",
+            "【ヒント2】書類で見つかった罪名。",
+            "【ヒント3】『横領』です。"
+        ]
+    },
+    {
+        id: 14,
+        title: "第14問：探偵・橘の真意",
+        hinana: "橘探偵は『脅迫状の調査に来た』と言っていたけど、なんだか現場を誘導している気がする...",
+        kaikun: "橘の手帳：被害者に対する復讐の文字と、犯行のタイムスケジュールが詳細に書かれている。",
+        q: "橘探偵の本当の正体（黒幕/共犯/偽者）どれ？",
+        ans: ["黒幕", "共犯", "偽者"],
+        hints: [
+            "【ヒント1】事件を裏で操っていた人物です。",
+            "【ヒント2】探偵ではなく仕掛け人。",
+            "【ヒント3】『黒幕』または『共犯』です。"
+        ]
+    },
+    {
+        id: 15,
+        title: "第15問：地下抜け道の地図",
+        hinana: "書斎の隠し扉の先に地下道がある！分岐点に『右・左・直進・右』の矢印が描かれているわ。",
+        kaikun: "壁の落書き：『逆から進め、左右は反転せよ』",
+        q: "正しい進み方を4文字で答えよ（例：右左直右）",
+        ans: ["左右直左"],
+        hints: [
+            "【ヒント1】『右・左・直進・右』を逆から読むと『右・直進・左・右』。",
+            "【ヒント2】さらに左右を反転させます（右→左、左→右）。",
+            "【ヒント3】『左右直左』です。"
+        ]
+    },
+    {
+        id: 16,
+        title: "第16問：伏線の回収・真の凶器",
+        hinana: "待って！ナイフで刺された痕があったけど、検死結果をよく見たら『死因は刺創ではなく毒殺』って書かれている！",
+        kaikun: "ナイフの傷は死亡後に付けられた偽装工作だった。本当の毒は『お茶』に仕込まれていた。",
+        q: "毒入りのお茶を運んだ人物の番号（1〜6）は？",
+        ans: ["5", "結城"],
+        hints: [
+            "【ヒント1】第7問で20時15分にお茶を運んだ人物です。",
+            "【ヒント2】メイドの結城です。",
+            "【ヒント3】『5』です。"
+        ]
+    },
+    {
+        id: 17,
+        title: "第17問：どんでん返しの真相",
+        hinana: "でも結城メイドはお茶に毒を入れていないと泣いているわ！本当にお茶に毒を入れることができたのは...",
+        kaikun: "厨房で『主治医・翠川』が持病の薬と偽って毒物をすり替えていた現場写真が残されていた！",
+        q: "実際に毒を用意した真犯人の番号（1〜6）は？",
+        ans: ["4", "翠川"],
+        hints: [
+            "【ヒント1】薬品を扱える人物です。",
+            "【ヒント2】主治医の翠川医師。",
+            "【ヒント3】『4』です。"
+        ]
+    },
+    {
+        id: 18,
+        title: "最終問：事件の真相告発",
+        hinana: "すべての謎が解けたわ！犯人は『密室』と『死亡推定時刻』と『死因』を偽装して、結城さんに罪をなすりつけようとしたのね！",
+        kaikun: "ひなな、最後だ。真犯人の名前を引導として告発しよう！",
+        q: "【最終告発】真犯人のフルネーム（漢字またはカタカナ）を入力せよ",
+        ans: ["翠川", "翠川医師", "みどりかわ"],
+        hints: [
+            "【ヒント1】主治医の男性です。",
+            "【ヒント2】苗字は『翠川』です。",
+            "【ヒント3】『翠川』を入力して真実をあばけ！"
+        ]
+    }
+];
+
+let currentStageIndex = 0;
+let currentRole = 'hinana';
+let unlockedHints = [];
+
+const titleScreen = document.getElementById('title-screen');
+const stageTitleEl = document.getElementById('stage-title');
+const roleBadgeEl = document.getElementById('role-badge');
+const storyDisplayEl = document.getElementById('story-display');
+const questionTextEl = document.getElementById('question-text');
+const answerInputEl = document.getElementById('answer-input');
+const hintContainerEl = document.getElementById('hint-container');
+const btnResume = document.getElementById('btn-resume-game');
+const resumeStageSpan = document.getElementById('resume-stage');
+
+window.addEventListener('load', () => {
+    const savedStage = localStorage.getItem('mystery_game_stage');
+    if (savedStage && parseInt(savedStage) > 0) {
+        resumeStageSpan.textContent = parseInt(savedStage) + 1;
+        btnResume.style.display = 'block';
+    }
+});
+
+document.getElementById('btn-start-game').addEventListener('click', () => {
+    audio.playClick();
+    audio.startBGM();
+    startGame(0);
+});
+
+btnResume.addEventListener('click', () => {
+    audio.playClick();
+    audio.startBGM();
+    const savedStage = parseInt(localStorage.getItem('mystery_game_stage') || '0');
+    startGame(savedStage);
+});
+
+document.getElementById('btn-sound-toggle').addEventListener('click', (e) => {
+    const isPlaying = audio.toggleBGM();
+    e.target.textContent = isPlaying ? "🔊 BGM" : "🔇 BGM";
+});
+
+function startGame(stageIdx) {
+    titleScreen.style.display = 'none';
+    loadStage(stageIdx);
+}
+
+function loadStage(idx) {
+    currentStageIndex = idx;
+    unlockedHints = [];
+    const stage = STAGES[idx];
+
+    localStorage.setItem('mystery_game_stage', idx);
+
+    stageTitleEl.textContent = stage.title;
+    questionTextEl.textContent = stage.q;
+    answerInputEl.value = '';
+    renderHints();
+
+    updateRoleView();
+}
+
+function switchRole(role) {
+    audio.playClick();
+    currentRole = role;
+    
+    document.getElementById('tab-hinana').classList.toggle('active', role === 'hinana');
+    document.getElementById('tab-kaikun').classList.toggle('active', role === 'kaikun');
+    
+    updateRoleView();
+}
+
+function updateRoleView() {
+    const stage = STAGES[currentStageIndex];
+    if (currentRole === 'hinana') {
+        roleBadgeEl.className = 'role-badge hinana';
+        roleBadgeEl.textContent = '👩 ひなな専用の手がかり（証言・雰囲気）';
+        storyDisplayEl.textContent = stage.hinana;
+    } else {
+        roleBadgeEl.className = 'role-badge kaikun';
+        roleBadgeEl.textContent = '👨 かいくん専用の手がかり（物証・データ）';
+        storyDisplayEl.textContent = stage.kaikun;
+    }
+}
+
+function checkAnswer() {
+    const userAns = answerInputEl.value.trim().toLowerCase();
+    const stage = STAGES[currentStageIndex];
+    
+    if (!userAns) return;
+
+    const isCorrect = stage.ans.some(a => a.toLowerCase() === userAns);
+
+    if (isCorrect) {
+        audio.playCorrect();
+        if (currentStageIndex + 1 < STAGES.length) {
+            alert("正解！次の謎へ進みます。");
+            loadStage(currentStageIndex + 1);
+        } else {
+            alert("【事件解決！】\nおめでとうございます！2人の鮮やかな推理によって天空の館の真相が暴かれました！");
+            localStorage.removeItem('mystery_game_stage');
+            location.reload();
+        }
+    } else {
+        audio.playWrong();
+        alert("不正解です... もう一度情報を整理してみましょう。");
+    }
+}
+
+function revealHint(hintNum) {
+    audio.playClick();
+    if (!unlockedHints.includes(hintNum)) {
+        unlockedHints.push(hintNum);
+        unlockedHints.sort((a, b) => a - b);
+    }
+    renderHints();
+}
+
+function renderHints() {
+    hintContainerEl.innerHTML = '';
+    if (unlockedHints.length === 0) return;
+
+    const stage = STAGES[currentStageIndex];
+    unlockedHints.forEach(num => {
+        const div = document.createElement('div');
+        div.className = 'hint-content';
+        div.textContent = stage.hints[num - 1];
+        hintContainerEl.appendChild(div);
+    });
+}
+
+document.getElementById('btn-open-dossier').addEventListener('click', () => {
+    audio.playClick();
+    document.getElementById('dossier-modal').style.display = 'flex';
+});
+
+function closeDossier() {
+    audio.playClick();
+    document.getElementById('dossier-modal').style.display = 'none';
+}
+</script>
+</body>
+</html>
